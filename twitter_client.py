@@ -1,8 +1,9 @@
-import tweepy
 import re
+import tweepy
 import twitter_credentials
 
 from tweepy import OAuthHandler
+from tweepy.parsers import JSONParser
 from textblob import TextBlob
 
 class TwitterClient(object):
@@ -27,7 +28,7 @@ class TwitterClient(object):
             # set access token and secret
             self.auth.set_access_token(access_token, access_token_secret)
             # create tweepy API object to fetch tweets
-            self.api = tweepy.API(self.auth)
+            self.api = tweepy.API(self.auth, parser=JSONParser(), wait_on_rate_limit=True)
         except:
             print("Error: Authentication Failed")
 
@@ -37,6 +38,9 @@ class TwitterClient(object):
         using simple regex statements.
         '''
         return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])| (\w+:\ / \ / \S+)", " ", tweet).split())
+
+    def get_auth(self):
+        return self.auth
 
     def get_tweet_sentiment(self, tweet):
         '''
@@ -83,6 +87,18 @@ class TwitterClient(object):
                     tweets.append(parsed_tweet)
 
             # return parsed tweets
+            return tweets
+
+        except tweepy.TweepError as e:
+            # print error (if any)
+            print("Error : " + str(e))
+
+    def get_fetched_tweets(self, query, count=10):
+        try:
+            # Call twitter api to fetch tweets
+            tweets = self.api.search(q=query, count=count)
+
+            # Return fetched tweets
             return tweets
 
         except tweepy.TweepError as e:

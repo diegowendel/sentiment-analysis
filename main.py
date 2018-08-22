@@ -1,35 +1,38 @@
 from twitter_client import TwitterClient
+from database import Database
+from tweepy import Stream
+from tweepy.streaming import StreamListener
+
+'''def openCSV(tweets):
+    with open('tweetsxs.csv', 'w') as csv_file:
+        csv_file.write('Tweet, Data\n')
+        for tweet in tweets:
+            csv_file.write('%s,%s\n' % (tweet.text.encode("utf8"), tweet.created_at))'''
+
+database = Database()
+
+class TweetStreamer(StreamListener):
+    def on_data(self, raw_data):
+        database.persist_tweet(raw_data)
+        return True
+
+    def on_error(self, status_code):
+        print(status_code)
+
+    def stream(self, auth):
+        streamer = Stream(auth, self)
+        streamer.filter(track=['jair bolsonaro', 'bolsonaro', 'lula', 'pt'])
 
 def main():
-    # Creating object of TwitterClient Class
+    # Prepara o banco de dados para receber os tweets
+    database.create_table_tweets()
+
+    # Criando o objeto TwitterClient que embala a api
     api = TwitterClient()
-    # Calling function to get tweets
-    tweets = api.get_tweets(query= 'Bolsonaro', count = 200)
 
-    # Picking positive tweets from tweets
-    ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
-    # Percentage of positive tweets
-    print("Positive tweets percentage: {} %".format(100*len(ptweets)/len(tweets)))
-
-    # Picking negative tweets from tweets
-    ntweets = [tweet for tweet in tweets if tweet['sentiment'] == 'negative']
-    # Percentage of negative tweets
-    print("Negative tweets percentage: {} %".format(100*len(ntweets)/len(tweets)))
-
-    # Picking negative tweets from tweets
-    nttweets = [tweet for tweet in tweets if tweet['sentiment'] == 'neutral']
-    # Percentage of neutral tweets
-    print("Neutral tweets percentage: {} %".format(100 * len(nttweets) / len(tweets)))
-
-    # printing first 5 positive tweets
-    print("\n\nPositive tweets:")
-    for tweet in ptweets[:10]:
-        print(tweet['text'])
-
-    # printing first 5 negative tweets
-    print("\n\nNegative tweets:")
-    for tweet in ntweets[:10]:
-        print(tweet['text'])
+    # Criando o streamer
+    streamer = TweetStreamer()
+    streamer.stream(api.get_auth())
 
 if __name__ == "__main__":
     # Calling main function
