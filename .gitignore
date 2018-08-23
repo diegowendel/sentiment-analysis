@@ -2,6 +2,9 @@
 src/witter_credentials.py
 src/twitter_credentials.pyc
 
+# pycharm
+.idea
+
 # virtualenv
 .venv
 venv/
