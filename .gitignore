@@ -1,9 +1,15 @@
 # credentials
-src/twitter_credentials.py
-src/twitter_credentials.pyc
+src/twitter/twitter_credentials.py
+src/twitter/twitter_credentials.pyc
 
 # pycharm
 .idea
+
+# pycache
+src/__pycache__
+src/analyser/__pycache__
+src/database/__pycache__
+src/twitter/__pycache__
 
 # virtualenv
 .venv

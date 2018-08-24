@@ -1,5 +1,5 @@
-from src.twitter_client import TwitterClient
-from src.database import Database
+from src.twitter.twitter_client import TwitterClient
+from src.database.database import Database
 from tweepy import Stream
 from tweepy.streaming import StreamListener
 

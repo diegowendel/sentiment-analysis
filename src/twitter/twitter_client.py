@@ -1,6 +1,6 @@
 import re
 import tweepy
-from src import twitter_credentials
+from src.twitter import twitter_credentials
 
 from tweepy import OAuthHandler
 from textblob import TextBlob
