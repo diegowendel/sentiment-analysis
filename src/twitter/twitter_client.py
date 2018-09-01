@@ -3,6 +3,7 @@ import tweepy
 from src.twitter import twitter_credentials
 
 from tweepy import OAuthHandler
+from tweepy.parsers import JSONParser
 from textblob import TextBlob
 from datetime import datetime, timedelta
 
@@ -28,7 +29,8 @@ class TwitterClient(object):
             # set access token and secret
             self.auth.set_access_token(access_token, access_token_secret)
             # create tweepy API object to fetch tweets
-            self.api = tweepy.API(self.auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+            #self.api = tweepy.API(self.auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+            self.api = tweepy.API(self.auth, parser=JSONParser(), wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
         except:
             print("Error: Twitter Authentication Failed")
 
@@ -102,7 +104,8 @@ class TwitterClient(object):
             sincedate = untildate - timedelta(days=8)
 
             #tweets = self.api.search(q=query, count=count)
-            tweets = tweepy.Cursor(self.api.search, q=query_filtered, since=sincedate.strftime("%Y-%m-%d"), until=untildate.strftime("%Y-%m-%d"), lang="pt", tweet_mode='extended').items(count)
+            tweets = tweepy.Cursor(self.api.search, q=query_filtered, since=sincedate.strftime("%Y-%m-%d"),
+                                   until=untildate.strftime("%Y-%m-%d"), lang="pt", tweet_mode='extended').items(count)
 
             # Return fetched tweets
             return tweets

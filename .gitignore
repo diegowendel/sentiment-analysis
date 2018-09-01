@@ -10,6 +10,7 @@ src/__pycache__
 src/analyser/__pycache__
 src/database/__pycache__
 src/twitter/__pycache__
+src/utils/__pycache__
 
 # virtualenv
 .venv

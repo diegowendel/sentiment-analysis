@@ -1,9 +1,11 @@
-from src.twitter.twitter_client import TwitterClient
-from src.database.database import Database
 from tweepy import Stream
 from tweepy.streaming import StreamListener
 
-database = Database()
+from src.database.database_mongo import DatabaseMongo
+from src.twitter.twitter_client import TwitterClient
+from src.utils.logger import Logger
+
+mongo = DatabaseMongo()
 
 ''' 
     Streamer - Tempo real
@@ -12,12 +14,15 @@ database = Database()
     Obs: Não é possível excluir os RTs em nível de API com o Streamer, deve ser implementado manualmente esse filtro.
 '''
 class TweetStreamer(StreamListener):
-    def on_data(self, raw_data):
-        database.persist_tweet(raw_data)
+    def __init__(self):
+        Logger.success('TSAP streamer started...')
+
+    def on_data(self, data):
+        mongo.persist_tweet(data)
         return True
 
     def on_error(self, status_code):
-        print(status_code)
+        Logger.error(status_code)
 
     def stream(self, auth, filter):
         streamer = Stream(auth, self)
@@ -27,21 +32,16 @@ class TweetStreamer(StreamListener):
     Main
 '''
 def main():
-    # Prepara o banco de dados para receber os tweets
-    database.create_table_tweets()
-
     # Criando o objeto TwitterClient que embala a api
     api = TwitterClient()
 
-    tweets = api.get_tweets('bolsonaro')
+    '''tweets = api.get_tweets('bolsonaro')
     for tweet in tweets:
-        database.persist_tweet(tweet)
+        database.persist_tweet(tweet)'''
 
     # Criando o streamer
-    #streamer = TweetStreamer()
-    #streamer.stream(api.get_auth(), ['jair bolsonaro', 'bolsonaro', 'lula'])
-
-    print('terminated')
+    streamer = TweetStreamer()
+    streamer.stream(api.get_auth(), ['jair bolsonaro', 'bolsonaro', 'lula'])
 
 if __name__ == "__main__":
     # Calling main function
