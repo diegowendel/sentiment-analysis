@@ -7,6 +7,21 @@ from src.utils.logger import Logger
 
 mongo = DatabaseMongo()
 
+queries = ['@alvarodias_', 'alvaro dias', 'alvaro',
+           '@CaboDaciolo', 'cabo daciolo', 'daciolo',
+           '@cirogomes', 'ciro gomes', 'ciro',
+           '@Haddad_Fernando', 'fernando haddad', 'haddad',
+           '@geraldoalckmin', 'geraldo alckmin', 'alckmin',
+           '@GuilhermeBoulos', 'guilherme boulos', 'boulos',
+           '@meirelles', 'henrique meirelles', 'meirelles',
+           '@jairbolsonaro', 'jair bolsonaro', 'bolsonaro',
+           '@joaoamoedonovo', 'joao amoedo', 'amoedo',
+           '@joaogoulart54', 'joao goulart', 'goulart',
+           '@Eymaeloficial', 'jose maria eymael', 'eymael',
+           '@LulaOficial', 'luiz inácio lula da silva', 'lula',
+           '@MarinaSilva', 'marina silva', 'marina',
+           '@verapstu', 'vera lucia', 'vera']
+
 ''' 
     Streamer - Tempo real
     
@@ -41,7 +56,7 @@ def main():
 
     # Criando o streamer
     streamer = TweetStreamer()
-    streamer.stream(api.get_auth(), ['jair bolsonaro', 'bolsonaro', 'lula'])
+    streamer.stream(api.get_auth(), queries)
 
 if __name__ == "__main__":
     # Calling main function
