@@ -1,0 +1,26 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "TSAP - Twitter Sentiment Analysis applied on Political issues",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diegowendel/TSAP.git"
+  },
+  "author": "diegowendel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/diegowendel/TSAP/issues"
+  },
+  "homepage": "https://github.com/diegowendel/TSAP#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "express-load": "^1.1.16",
+    "mongoose": "^5.3.0"
+  }
+}
