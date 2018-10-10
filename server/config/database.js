@@ -3,7 +3,7 @@ const logger = require('../app/utils/logger');
 
 module.exports = (uri) => {
   // Mongoose database
-  mongoose.connect(uri);
+  mongoose.connect(uri, { useNewUrlParser: true });
 
   // When successfully connected
   mongoose.connection.on('connected', () => {

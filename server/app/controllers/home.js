@@ -4,5 +4,6 @@ module.exports = (app) => {
       res.render('home');
     }
   };
+  
   return HomeController;
 };

@@ -1,24 +1,23 @@
 $.getJSON(
   'https://cdn.rawgit.com/highcharts/highcharts/057b672172ccc6c08fe7dbb27fc17ebca3f5b770/samples/data/usdeur.json',
   function (data) {
-
       Highcharts.chart('container', {
           chart: {
               zoomType: 'x'
           },
           title: {
-              text: 'USD to EUR exchange rate over time'
+              text: 'Número de tweets ao longo do tempo'
           },
           subtitle: {
               text: document.ontouchstart === undefined ?
-                      'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+                'Clique e arraste em uma área do gráfico para aumentar o zoom' : 'Pinch the chart to zoom in'
           },
           xAxis: {
               type: 'datetime'
           },
           yAxis: {
               title: {
-                  text: 'Exchange rate'
+                  text: 'Número de tweets'
               }
           },
           legend: {
@@ -53,7 +52,7 @@ $.getJSON(
 
           series: [{
               type: 'area',
-              name: 'USD to EUR',
+              name: 'Quantidade de tweets',
               data: data
           }]
       });
