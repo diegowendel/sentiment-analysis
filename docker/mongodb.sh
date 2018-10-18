@@ -9,4 +9,5 @@ VOLUME="-v $DIR/data:/data/db"
 docker run  $NAME \
             $PORTS \
             $VOLUME \
-            -d mongo
+            -d mongo:4
+
