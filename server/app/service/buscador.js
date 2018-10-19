@@ -33,7 +33,7 @@ const obterQueryString = (candidato) => {
   }
 }
 
-const buscarMes = (Tweets, candidato) => {
+const buscarMes = (Tweets, candidato, callback) => {
   const queryString = obterQueryString(candidato);
   Tweets.aggregate([
     {
@@ -43,12 +43,12 @@ const buscarMes = (Tweets, candidato) => {
             $and : [
               {
                 "timestamp_ms" : {
-                  $gte : Date.UTC(2018, 9, 17, 0, 0, 0).toString()
+                  $gte : Date.UTC(2018, 9, 1, 0, 0, 0).toString()
                 }
               },
               {
                 "timestamp_ms" : {
-                  $lte : Date.UTC(2018, 9, 18, 0, 0, 0).toString()
+                  $lte : Date.UTC(2018, 9, 31, 0, 0, 0).toString()
                 }
               }
             ]
@@ -92,9 +92,9 @@ const buscarMes = (Tweets, candidato) => {
     }
   ], function (err, result) {
     if (err) {
-      console.log(err);
+      console.log('Erro no aggregate:', err);
     } else {
-      console.log(result);
+      callback(result);
     }
   });
 };

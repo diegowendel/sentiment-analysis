@@ -17,7 +17,13 @@ module.exports = (app) => {
     },
     countTweets(req, res) {
       const candidato = Number(req.params.candidato);
-      buscador.buscarMes(Tweets, candidato);
+      buscador.buscarMes(Tweets, candidato, function(aggregateResult) {
+        if (aggregateResult) {
+          res.status(200).json(aggregateResult);
+        } else {
+          res.status(500).send('');
+        }
+      });
     }
   };
   
