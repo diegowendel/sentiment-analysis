@@ -1,4 +1,6 @@
 const buscador = require('../service/buscador');
+const objectUtils = require('../utils/objectUtils');
+const moment = require('moment');
 
 module.exports = (app) => {
   const Tweets = app.models.tweet;
@@ -19,7 +21,15 @@ module.exports = (app) => {
       const candidato = Number(req.params.candidato);
       buscador.buscarMes(Tweets, candidato, function(aggregateResult) {
         if (aggregateResult) {
-          res.status(200).json(aggregateResult);
+          let dataToChart = aggregateResult.map(function(obj) {
+            return Object.keys(obj).sort().map(function(key) {
+              if (objectUtils.isObject(obj[key])) {
+                return moment(obj[key].date, 'DD-MM-YYYY').toDate().valueOf();
+              }
+              return obj[key];
+            });
+          });
+          res.status(200).json(dataToChart);
         } else {
           res.status(500).send('');
         }

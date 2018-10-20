@@ -79,7 +79,6 @@ const buscarMes = (Tweets, candidato, callback) => {
     {
       $group: {
         _id: {
-          "lang": "$lang",
           "date": "$date"
         },
         count: {$sum: 1}
