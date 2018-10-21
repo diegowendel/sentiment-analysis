@@ -39,7 +39,7 @@
         <div class="form-group">
           <label for="exampleFormControlSelect1">Candidatos participantes</label>
           <select class="form-control" id="exampleFormControlSelect1">
-            <option selected>Selecionar...</option>
+            <option value="0" selected>Selecionar...</option>
             <option value="1">Alvaro Dias</option>
             <option value="2">Cabo Daciolo</option>
             <option value="3">Ciro Gomes</option>
@@ -57,7 +57,7 @@
           </select>
         </div>
       </form>
-      <h4>Gráfico temporal do número de tweets sobre o candidato x</h4>
+      <span>Gráfico temporal do número de tweets sobre o(a) candidato(a): </span><span id="nome_candidato"></span>
       <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
     </main>
 
@@ -70,7 +70,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
     <!-- Other JavaScript files -->
-    <script src="/js/chart.js"></script>
     <script src="/js/visualizador.js"></script>
   </body>
 </html>
