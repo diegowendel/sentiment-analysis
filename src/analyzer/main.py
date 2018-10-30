@@ -1,11 +1,13 @@
 from tweepy import Stream
 from tweepy.streaming import StreamListener
 
+from src.analyzer.preprocessor import PreProcessor
 from src.database.database_mongo import DatabaseMongo
 from src.twitter.twitter_client import TwitterClient
 from src.utils.logger import Logger
 
 mongo = DatabaseMongo()
+preprocessor = PreProcessor()
 
 queries = ['@alvarodias_', 'alvaro dias', 'alvaro',
            '@CaboDaciolo', 'cabo daciolo', 'daciolo',
@@ -50,13 +52,17 @@ def main():
     # Criando o objeto TwitterClient que embala a api
     api = TwitterClient()
 
-    '''tweets = api.get_tweets('bolsonaro')
-    for tweet in tweets:
-        database.persist_tweet(tweet)'''
-
     # Criando o streamer
-    streamer = TweetStreamer()
-    streamer.stream(api.get_auth(), queries)
+    #streamer = TweetStreamer()
+    #streamer.stream(api.get_auth(), queries)
+
+    tweets = mongo.find()
+    for tweet in tweets:
+        # Verifica se é um tweet com texto estendido
+        if 'extended_tweet' in tweet:
+            tweet['extended_tweet']['full_text'] = preprocessor.process(tweet['extended_tweet']['full_text'])
+        tweet['text'] = preprocessor.process(tweet['text'])
+        mongo.update(tweet)
 
 if __name__ == "__main__":
     # Calling main function

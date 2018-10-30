@@ -19,6 +19,13 @@ class DatabaseMongo(object):
         database = client['tsap']
         self.collection = database['tweets']
 
+    def find(self):
+        tweets = self.collection.find({})
+        return tweets
+
+    def update(self, tweet):
+        self.collection.save(tweet)
+
     def persist_tweet(self, tweet):
         try:
             tweet_json = json.loads(tweet)
