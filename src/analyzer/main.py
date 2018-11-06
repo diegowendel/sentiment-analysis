@@ -45,6 +45,19 @@ class TweetStreamer(StreamListener):
         streamer = Stream(auth, self)
         streamer.filter(track=filter, async=True)
 
+def skiplimit(page_size, page_num):
+    """returns a set of documents belonging to page number `page_num`
+    where size of each page is `page_size`.
+    """
+    # Calculate number of documents to skip
+    skips = page_size * (page_num - 1)
+
+    # Skip and limit
+    cursor = mongo.find().skip(skips).limit(page_size)
+
+    # Return documents
+    return cursor
+
 '''
     Main
 '''
@@ -56,13 +69,20 @@ def main():
     #streamer = TweetStreamer()
     #streamer.stream(api.get_auth(), queries)
 
-    tweets = mongo.find()
-    for tweet in tweets:
-        # Verifica se é um tweet com texto estendido
-        if 'extended_tweet' in tweet:
-            tweet['extended_tweet']['full_text'] = preprocessor.process(tweet['extended_tweet']['full_text'])
-        tweet['text'] = preprocessor.process(tweet['text'])
-        mongo.update(tweet)
+    inicio = 1
+    #fim = 144369
+    fim = 2
+
+    for i in range(inicio, fim):
+        tweets = skiplimit(100, i)
+
+        for tweet in tweets:
+            print('tweeeet')
+            # Verifica se é um tweet com texto estendido
+            if 'extended_tweet' in tweet:
+                tweet['texto_full_processado'] = preprocessor.process(tweet['extended_tweet']['full_text'])
+            tweet['texto_processado'] = preprocessor.process(tweet['text'])
+            mongo.update(tweet)
 
 if __name__ == "__main__":
     # Calling main function
