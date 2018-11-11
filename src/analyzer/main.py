@@ -1,60 +1,34 @@
-from tweepy import Stream
-from tweepy.streaming import StreamListener
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
 
+from src.analyzer.classifier import Classifier
 from src.analyzer.preprocessor import PreProcessor
 from src.database.database_mongo import DatabaseMongo
-from src.twitter.twitter_client import TwitterClient
 from src.utils.logger import Logger
-from src.analyzer.classifier import Classifier
 from src.utils.utils import Tweet
+from src.twitter.streamer import TweetStreamer
+from src.twitter.twitter_client import TwitterClient
+
+import pandas as pd
 
 mongo = DatabaseMongo()
 preprocessor = PreProcessor()
-
-queries = ['@alvarodias_', 'alvaro dias', 'alvaro',
-           '@CaboDaciolo', 'cabo daciolo', 'daciolo',
-           '@cirogomes', 'ciro gomes', 'ciro',
-           '@Haddad_Fernando', 'fernando haddad', 'haddad',
-           '@geraldoalckmin', 'geraldo alckmin', 'alckmin',
-           '@GuilhermeBoulos', 'guilherme boulos', 'boulos',
-           '@meirelles', 'henrique meirelles', 'meirelles',
-           '@jairbolsonaro', 'jair bolsonaro', 'bolsonaro',
-           '@joaoamoedonovo', 'joao amoedo', 'amoedo',
-           '@joaogoulart54', 'joao goulart', 'goulart',
-           '@Eymaeloficial', 'jose maria eymael', 'eymael',
-           '@LulaOficial', 'luiz inácio lula da silva', 'lula',
-           '@MarinaSilva', 'marina silva', 'marina',
-           '@verapstu', 'vera lucia', 'vera']
 
 '''
 ******************************************************************************
 ********************************** STREAMER **********************************
 ******************************************************************************
- 
-Streamer - Tempo real
-    
-Obtém os tweets em tempo real de acordo com o filter, passado como parâmetro.
-Obs: Não é possível excluir os RTs em nível de API com o Streamer, deve ser implementado manualmente esse filtro.
-
 '''
-class TweetStreamer(StreamListener):
-    def __init__(self):
-        Logger.success('TSAP streamer started...')
-
-    def on_data(self, data):
-        mongo.persist_tweet(data)
-        return True
-
-    def on_error(self, status_code):
-        Logger.error(status_code)
-
-    def stream(self, auth, filter):
-        streamer = Stream(auth, self)
-        streamer.filter(track=filter, async=True)
+def stream():
+    # Criando o objeto TwitterClient que embala a api
+    api = TwitterClient()
+    # Criando o streamer
+    streamer = TweetStreamer()
+    streamer.stream(api.get_auth(), api.get_queries())
 
 '''
 ******************************************************************************
-******************************** CLASSIFICADOR *******************************
+***************************** CLASSIFICADOR MANUAL ***************************
 ******************************************************************************
 '''
 def classificar():
@@ -77,14 +51,19 @@ def classificar():
                 print(tweet['text'])
                 classificacao = input("Classificação: ")
                 tweet['classificacao'] = classificacao
-            mongo.persist_treino(tweet)
+            mongo.persist_classified(tweet)
 
+'''
+******************************************************************************
+************************* PRÉ-PROCESSAMENTO DE TWEETS ************************
+******************************************************************************
+'''
 def preprocessar():
     inicio = 1
     fim = 21
     j = 1
     for i in range(inicio, fim):
-        tweets = mongo.find_paginated(100, i)
+        tweets = mongo.find_paginated_classified(100, i)
 
         for tweet in tweets:
             print(j)
@@ -94,7 +73,43 @@ def preprocessar():
                 tweet['preprocessado'] = preprocessor.process(tweet['extended_tweet']['full_text'])
             else:
                 tweet['preprocessado'] = preprocessor.process(tweet['text'])
-            mongo.persist_treino(tweet)
+            mongo.persist_classified(tweet)
+
+'''
+******************************************************************************
+*************************** ANÁLISE DE SENTIMENTOS ***************************
+******************************************************************************
+'''
+def analisar_sentimentos():
+    '''dataset = mongo.find_all_classificados()
+        tweets = Tweet.get_tweets_texts_from_dataset(dataset)
+        # RESET CURSOR
+        dataset = mongo.find_all_classificados()
+        classifications = Tweet.get_tweets_classifications(dataset)'''
+
+    dataset = pd.read_csv('tweets_mg.csv')
+    dataset.count()
+    tweets = dataset['Text'].values
+    classes = dataset['Classificacao'].values
+
+    ''' Classificador '''
+    vectorizer = CountVectorizer(analyzer="word")
+    classifier = MultinomialNB()
+    classificador = Classifier(vectorizer=vectorizer, classifier=classifier)
+    classificador.train(tweets=tweets, classifications=classes)
+
+    testes = ['Esse governo está no início, vamos ver o que vai dar',
+              'Estou muito feliz com o governo de Minas esse ano',
+              'O estado de Minas Gerais decretou calamidade financeira!!!',
+              'A segurança desse país está deixando a desejar',
+              'O governador de Minas é do PT']
+    t = classificador.predict(testes)
+    print(t)
+
+    resultados = classificador.cross_validation(tweets, classes, 10)
+    print('accuracy', classificador.accuracy(classes, resultados))
+
+    classificador.matriz_confusao(classes, resultados)
 
 '''
 ******************************************************************************
@@ -102,40 +117,10 @@ def preprocessar():
 ******************************************************************************
 '''
 def main():
-    #classifier.classify()
-
-    # Criando o objeto TwitterClient que embala a api
-    api = TwitterClient()
-
-    # Criando o streamer
-    #streamer = TweetStreamer()
-    #streamer.stream(api.get_auth(), queries)
-    j=1
-    dataset = mongo.find_all_classificados()
-    tweets = Tweet.get_tweets_texts_from_dataset(dataset)
-    classifications = Tweet.get_tweets_classifications(dataset)
-    for tweet in tweets:
-        print(j)
-        j = j + 1
-        print(tweet)
-
-    #preprocessar()
-    Logger.success('FINALIZADO!!!')
-'''
-    inicio = 1
-    #fim = 144369
-    fim = 2
-
-    for i in range(inicio, fim):
-        tweets = skiplimit(100, i)
-
-        for tweet in tweets:
-            print('tweeeet')
-            # Verifica se é um tweet com texto estendido
-            if 'extended_tweet' in tweet:
-                tweet['texto_full_processado'] = preprocessor.process(tweet['extended_tweet']['full_text'])
-            tweet['texto_processado'] = preprocessor.process(tweet['text'])
-            mongo.update(tweet)'''
+    stream() # Download de tweets
+    # classificar() # Classificação manual de tweets
+    # preprocessar() # Pré-processa os tweets
+    #analisar_sentimentos() # Analisa os sentimentos dos tweets
 
 if __name__ == "__main__":
     # Calling main function

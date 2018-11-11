@@ -113,3 +113,19 @@ class TwitterClient(object):
         except tweepy.TweepError as e:
             # print error (if any)
             print("Error : " + str(e))
+
+    def get_queries(self):
+        return ['@alvarodias_', 'alvaro dias', 'alvaro',
+                   '@CaboDaciolo', 'cabo daciolo', 'daciolo',
+                   '@cirogomes', 'ciro gomes', 'ciro',
+                   '@Haddad_Fernando', 'fernando haddad', 'haddad',
+                   '@geraldoalckmin', 'geraldo alckmin', 'alckmin',
+                   '@GuilhermeBoulos', 'guilherme boulos', 'boulos',
+                   '@meirelles', 'henrique meirelles', 'meirelles',
+                   '@jairbolsonaro', 'jair bolsonaro', 'bolsonaro',
+                   '@joaoamoedonovo', 'joao amoedo', 'amoedo',
+                   '@joaogoulart54', 'joao goulart', 'goulart',
+                   '@Eymaeloficial', 'jose maria eymael', 'eymael',
+                   '@LulaOficial', 'luiz inácio lula da silva', 'lula',
+                   '@MarinaSilva', 'marina silva', 'marina',
+                   '@verapstu', 'vera lucia', 'vera']

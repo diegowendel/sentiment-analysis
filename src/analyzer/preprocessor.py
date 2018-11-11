@@ -5,9 +5,9 @@ from string import punctuation
 from nltk.tokenize import TweetTokenizer
 from nltk.corpus import stopwords
 
-nltk.download('rslp')
-nltk.download('stopwords')
-nltk.download('punkt')
+#nltk.download('rslp')
+#nltk.download('stopwords')
+#nltk.download('punkt')
 
 class PreProcessor(object):
 
@@ -15,7 +15,6 @@ class PreProcessor(object):
     tokenizer = TweetTokenizer(reduce_len=True, preserve_case=False)
 
     def process(self, tweet):
-        print(tweet)
         tweet = self.to_lower(tweet)
         tweet = self.remove_links(tweet)
         tweet = self.remove_mentions(tweet)
@@ -46,7 +45,6 @@ class PreProcessor(object):
             palavras_processadas.append(palavra)
 
         tweet = ' '.join(palavras_processadas)
-        print(tweet)
         return tweet
 
     def to_lower(self, tweet):
