@@ -39,8 +39,7 @@ def classificar():
         tweets = mongo.find_paginated(100, i)
 
         for tweet in tweets:
-            Logger.ok(' ----- Classifique ----- ')
-            print(j)
+            Logger.ok('\n\n----- Classifique: ' + str(j) + ' -----')
             j = j + 1
             # Verifica se é um tweet com texto estendido
             if 'extended_tweet' in tweet:
@@ -117,10 +116,10 @@ def analisar_sentimentos():
 ******************************************************************************
 '''
 def main():
-    stream() # Download de tweets
-    # classificar() # Classificação manual de tweets
+    # stream() # Download de tweets
+    classificar() # Classificação manual de tweets
     # preprocessar() # Pré-processa os tweets
-    #analisar_sentimentos() # Analisa os sentimentos dos tweets
+    # analisar_sentimentos() # Analisa os sentimentos dos tweets
 
 if __name__ == "__main__":
     # Calling main function
