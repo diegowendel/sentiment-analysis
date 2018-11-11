@@ -60,7 +60,7 @@ class PreProcessor(object):
         return re.sub("@\S+", "", tweet)
 
     def remove_hashtags(self, tweet):
-        return re.sub("#\S+", "", tweet)
+        return re.sub("#", "", tweet)
 
     def remove_numbers(self, tweet):
         return re.sub("\d+", "", tweet)

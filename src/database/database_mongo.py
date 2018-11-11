@@ -17,19 +17,39 @@ class DatabaseMongo(object):
         '''
         client = MongoClient(self.host, self.port)
         database = client['tsap']
-        self.collection = database['tweets']
+        self.collection = database['tweets_mencoes']
+        self.collection_classificados = database['tweets_classificados']
+
+    def find_paginated(self, page_size, page_num):
+        """returns a set of documents belonging to page number `page_num`
+        where size of each page is `page_size`.
+        """
+        # Calculate number of documents to skip
+        skips = page_size * (page_num - 1)
+
+        # Skip and limit
+        cursor = self.collection.find().skip(skips).limit(page_size)
+
+        # Return documents
+        return cursor
 
     def find(self):
         tweets = self.collection.find({})
         return tweets
 
+    def find_all_classificados(self):
+        return self.collection_classificados.find({})
+
     def update(self, tweet):
         self.collection.save(tweet)
+
+    def persist_treino(self, tweet):
+        self.collection_classificados.save(tweet)
 
     def persist_tweet(self, tweet):
         try:
             tweet_json = json.loads(tweet)
-            if (Tweet.isRetweet(tweet_json)):
+            if (Tweet.is_retweet(tweet_json)):
                 Logger.warn('Ignorando RT...\n')
             else:
                 self.collection.insert(tweet_json)

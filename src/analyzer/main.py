@@ -5,6 +5,8 @@ from src.analyzer.preprocessor import PreProcessor
 from src.database.database_mongo import DatabaseMongo
 from src.twitter.twitter_client import TwitterClient
 from src.utils.logger import Logger
+from src.analyzer.classifier import Classifier
+from src.utils.utils import Tweet
 
 mongo = DatabaseMongo()
 preprocessor = PreProcessor()
@@ -24,11 +26,16 @@ queries = ['@alvarodias_', 'alvaro dias', 'alvaro',
            '@MarinaSilva', 'marina silva', 'marina',
            '@verapstu', 'vera lucia', 'vera']
 
-''' 
-    Streamer - Tempo real
+'''
+******************************************************************************
+********************************** STREAMER **********************************
+******************************************************************************
+ 
+Streamer - Tempo real
     
-    Obtém os tweets em tempo real de acordo com o filter, passado como parâmetro.
-    Obs: Não é possível excluir os RTs em nível de API com o Streamer, deve ser implementado manualmente esse filtro.
+Obtém os tweets em tempo real de acordo com o filter, passado como parâmetro.
+Obs: Não é possível excluir os RTs em nível de API com o Streamer, deve ser implementado manualmente esse filtro.
+
 '''
 class TweetStreamer(StreamListener):
     def __init__(self):
@@ -45,30 +52,76 @@ class TweetStreamer(StreamListener):
         streamer = Stream(auth, self)
         streamer.filter(track=filter, async=True)
 
-def skiplimit(page_size, page_num):
-    """returns a set of documents belonging to page number `page_num`
-    where size of each page is `page_size`.
-    """
-    # Calculate number of documents to skip
-    skips = page_size * (page_num - 1)
+'''
+******************************************************************************
+******************************** CLASSIFICADOR *******************************
+******************************************************************************
+'''
+def classificar():
+    inicio = 1
+    fim = 21
+    j = 1
+    for i in range(inicio, fim):
+        tweets = mongo.find_paginated(100, i)
 
-    # Skip and limit
-    cursor = mongo.find().skip(skips).limit(page_size)
+        for tweet in tweets:
+            Logger.ok(' ----- Classifique ----- ')
+            print(j)
+            j = j + 1
+            # Verifica se é um tweet com texto estendido
+            if 'extended_tweet' in tweet:
+                print(tweet['extended_tweet']['full_text'])
+                classificacao = input("Classificação: ")
+                tweet['classificacao'] = classificacao
+            else:
+                print(tweet['text'])
+                classificacao = input("Classificação: ")
+                tweet['classificacao'] = classificacao
+            mongo.persist_treino(tweet)
 
-    # Return documents
-    return cursor
+def preprocessar():
+    inicio = 1
+    fim = 21
+    j = 1
+    for i in range(inicio, fim):
+        tweets = mongo.find_paginated(100, i)
+
+        for tweet in tweets:
+            print(j)
+            j = j + 1
+            # Verifica se é um tweet com texto estendido
+            if 'extended_tweet' in tweet:
+                tweet['preprocessado'] = preprocessor.process(tweet['extended_tweet']['full_text'])
+            else:
+                tweet['preprocessado'] = preprocessor.process(tweet['text'])
+            mongo.persist_treino(tweet)
 
 '''
-    Main
+******************************************************************************
+************************************ MAIN ************************************
+******************************************************************************
 '''
 def main():
+    #classifier.classify()
+
     # Criando o objeto TwitterClient que embala a api
     api = TwitterClient()
 
     # Criando o streamer
     #streamer = TweetStreamer()
     #streamer.stream(api.get_auth(), queries)
+    j=1
+    dataset = mongo.find_all_classificados()
+    tweets = Tweet.get_tweets_texts_from_dataset(dataset)
+    classifications = Tweet.get_tweets_classifications(dataset)
+    for tweet in tweets:
+        print(j)
+        j = j + 1
+        print(tweet)
 
+    #preprocessar()
+    Logger.success('FINALIZADO!!!')
+'''
     inicio = 1
     #fim = 144369
     fim = 2
@@ -82,7 +135,7 @@ def main():
             if 'extended_tweet' in tweet:
                 tweet['texto_full_processado'] = preprocessor.process(tweet['extended_tweet']['full_text'])
             tweet['texto_processado'] = preprocessor.process(tweet['text'])
-            mongo.update(tweet)
+            mongo.update(tweet)'''
 
 if __name__ == "__main__":
     # Calling main function
