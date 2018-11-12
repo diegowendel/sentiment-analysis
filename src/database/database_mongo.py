@@ -19,6 +19,7 @@ class DatabaseMongo(object):
         database = client['tsap']
         self.collection = database['tweets']
         self.collection_classificados = database['tweets_classificados']
+        self.collection_manual = database['tweets_classificados_N_P_T']
 
     def find_paginated(self, page_size, page_num):
         # returns a set of documents belonging to page number `page_num` where size of each page is `page_size`.
@@ -33,6 +34,12 @@ class DatabaseMongo(object):
     def find_paginated_classified(self, page_size, page_num):
         skips = page_size * (page_num - 1)
         cursor = self.collection_classificados.find().skip(skips).limit(page_size)
+        return cursor
+
+    # The same as find_paginated, but on another collection
+    def find_paginated_csv(self, page_size, page_num):
+        skips = page_size * (page_num - 1)
+        cursor = self.collection_manual.find().skip(skips).limit(page_size)
         return cursor
 
     def find(self):

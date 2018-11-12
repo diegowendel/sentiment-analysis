@@ -33,7 +33,7 @@ def stream():
 '''
 def classificar():
     inicio = 1
-    fim = 21
+    fim = 11
     j = 1
     for i in range(inicio, fim):
         tweets = mongo.find_paginated(100, i)
@@ -52,6 +52,34 @@ def classificar():
                 tweet['classificacao'] = classificacao
             mongo.persist_classified(tweet)
 
+def migrar():
+    inicio = 1
+    fim = 6
+    j = 1
+    for i in range(inicio, fim):
+        tweets = mongo.find_paginated_csv(100, i)
+
+        for tweet in tweets:
+            j = j + 1
+            print(j)
+            classification = tweet['classificacao']
+            if classification == 'N':
+                tweet['classificacao'] = 'Negativo'
+            elif classification == 'P':
+                tweet['classificacao'] = 'Positivo'
+            else:
+                tweet['classificacao'] = 'Neutro'
+            mongo.persist_classified(tweet)
+
+def salvar_csv():
+    dataset = pd.read_csv('tweets_mg.csv')
+    for index, row in dataset.iterrows():
+        tweet = {}
+        tweet['text'] = row['Text']
+        tweet['preprocessado'] = preprocessor.process(row['Text'])
+        tweet['classificacao'] = row['Classificacao']
+        mongo.persist_classified(tweet)
+
 '''
 ******************************************************************************
 ************************* PRÉ-PROCESSAMENTO DE TWEETS ************************
@@ -59,7 +87,7 @@ def classificar():
 '''
 def preprocessar():
     inicio = 1
-    fim = 21
+    fim = 150
     j = 1
     for i in range(inicio, fim):
         tweets = mongo.find_paginated_classified(100, i)
@@ -80,30 +108,17 @@ def preprocessar():
 ******************************************************************************
 '''
 def analisar_sentimentos():
-    '''dataset = mongo.find_all_classificados()
-        tweets = Tweet.get_tweets_texts_from_dataset(dataset)
-        # RESET CURSOR
-        dataset = mongo.find_all_classificados()
-        classifications = Tweet.get_tweets_classifications(dataset)'''
-
-    dataset = pd.read_csv('tweets_mg.csv')
-    dataset.count()
-    tweets = dataset['Text'].values
-    classes = dataset['Classificacao'].values
+    dataset = mongo.find_all_classificados()
+    tweets = Tweet.get_tweets_texts_from_dataset(dataset)
+    # RESET CURSOR
+    dataset = mongo.find_all_classificados()
+    classes = Tweet.get_tweets_classifications(dataset)
 
     ''' Classificador '''
     vectorizer = CountVectorizer(analyzer="word")
     classifier = MultinomialNB()
     classificador = Classifier(vectorizer=vectorizer, classifier=classifier)
     classificador.train(tweets=tweets, classifications=classes)
-
-    testes = ['Esse governo está no início, vamos ver o que vai dar',
-              'Estou muito feliz com o governo de Minas esse ano',
-              'O estado de Minas Gerais decretou calamidade financeira!!!',
-              'A segurança desse país está deixando a desejar',
-              'O governador de Minas é do PT']
-    t = classificador.predict(testes)
-    print(t)
 
     resultados = classificador.cross_validation(tweets, classes, 10)
     print('accuracy', classificador.accuracy(classes, resultados))
@@ -117,9 +132,13 @@ def analisar_sentimentos():
 '''
 def main():
     # stream() # Download de tweets
-    classificar() # Classificação manual de tweets
-    # preprocessar() # Pré-processa os tweets
-    # analisar_sentimentos() # Analisa os sentimentos dos tweets
+    # classificar() # Classificação manual de tweets
+
+    # salvar_csv()
+    # migrar()
+
+    preprocessar() # Pré-processa os tweets
+    analisar_sentimentos() # Analisa os sentimentos dos tweets
 
 if __name__ == "__main__":
     # Calling main function

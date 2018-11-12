@@ -4,6 +4,7 @@ from sklearn import metrics
 from src.utils.logger import Logger
 
 import pandas as pd
+import numpy as np
 
 class Classifier(object):
 
@@ -31,6 +32,9 @@ class Classifier(object):
         return accuracy
 
     def matriz_confusao(self, classifications, resultados_cross_val):
-        matriz = pd.crosstab(classifications, resultados_cross_val, rownames=['Real'], colnames=['Predito'], margins=True)
+        # Classificações e resultados DEVEM estar estruturados como ARRAY
+        classifications_array = np.array(classifications)
+        resultados_array = np.array(resultados_cross_val)
+        matriz = pd.crosstab(classifications_array, resultados_array, rownames=['Real'], colnames=['Predito'], margins=True)
         Logger.ok('\nMATRIZ DE CONFUSÃO\n')
         print(matriz, '')

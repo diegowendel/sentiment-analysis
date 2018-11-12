@@ -13,6 +13,7 @@ class PreProcessor(object):
 
     stemmer = nltk.stem.RSLPStemmer()
     tokenizer = TweetTokenizer(reduce_len=True, preserve_case=False)
+    special_char = ['$', '%', '&', '*', '(', ')', '_', '-', '+', '=', '{', '[', '}', ']', '~', '.', ',', ';', 'º', 'ª', '°', '¹', '²', '³']
 
     def process(self, tweet):
         tweet = self.to_lower(tweet)
@@ -24,7 +25,7 @@ class PreProcessor(object):
 
         palavras = self.tokenizer.tokenize(tweet)
         palavras = self.remove_punctuation(palavras)
-        # palavras = self.remove_stopwords(palavras)
+        #palavras = self.remove_stopwords(palavras)
 
         palavras_processadas = []
         for palavra in palavras:
@@ -42,9 +43,13 @@ class PreProcessor(object):
             if len(palavra) <= 2:
                 palavra = ''
 
+            for s in self.special_char:
+                palavra = palavra.replace(s, '')
+
             palavras_processadas.append(palavra)
 
         tweet = ' '.join(palavras_processadas)
+        tweet = self.remove_duplicated_spaces(tweet)
         return tweet
 
     def to_lower(self, tweet):
@@ -68,8 +73,9 @@ class PreProcessor(object):
         pattern = re.compile(r"(.)\1{2,}", re.DOTALL)
         return pattern.sub(r"\1\1", tweet)
 
-    def remove_special_char(self, tweet):
-        return re.sub("[^A-Za-z ]", "", tweet)
+    def remove_duplicated_spaces(self, tweet):
+        tweet = tweet.strip()  # Remove spaces before and after string
+        return re.sub(" +", " ", tweet)
 
     def remove_stopwords(self, palavras):
         return [palavra for palavra in palavras if palavra not in stopwords.words('portuguese')]
