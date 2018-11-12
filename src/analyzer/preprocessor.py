@@ -25,7 +25,7 @@ class PreProcessor(object):
 
         palavras = self.tokenizer.tokenize(tweet)
         palavras = self.remove_punctuation(palavras)
-        #palavras = self.remove_stopwords(palavras)
+        # palavras = self.remove_stopwords(palavras)
 
         palavras_processadas = []
         for palavra in palavras:

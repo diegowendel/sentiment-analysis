@@ -1,5 +1,7 @@
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import SVC
 
 from src.analyzer.classifier import Classifier
 from src.analyzer.preprocessor import PreProcessor
@@ -115,13 +117,20 @@ def analisar_sentimentos():
     classes = Tweet.get_tweets_classifications(dataset)
 
     ''' Classificador '''
-    vectorizer = CountVectorizer(analyzer="word")
-    classifier = MultinomialNB()
+    ''' CountVectorizer + Naive Bayes '''
+    # vectorizer = CountVectorizer(ngram_range=(1, 2))
+    # vectorizer = CountVectorizer(analyzer="word")
+    # classifier = MultinomialNB()
+
+    ''' TfidfVectorizer + Support Vector Classification (SVC) '''
+    vectorizer = TfidfVectorizer(min_df=0.0, max_df=1.0, sublinear_tf=True, use_idf=True)
+    classifier = SVC(kernel='rbf', C=2.9, gamma=1)
+
     classificador = Classifier(vectorizer=vectorizer, classifier=classifier)
     classificador.train(tweets=tweets, classifications=classes)
 
     resultados = classificador.cross_validation(tweets, classes, 10)
-    print('accuracy', classificador.accuracy(classes, resultados))
+    Logger.ok('ACURÁCIA: ' + str(classificador.accuracy(classes, resultados)))
 
     classificador.matriz_confusao(classes, resultados)
 
