@@ -1,0 +1,69 @@
+db.tweets_testes_classificados.aggregate(
+  [
+    {
+      $match : {
+        $and: [
+          {
+            $and : [
+              {
+                "timestamp_ms" : {
+                  $gte : Date.UTC(2018, 8, 1, 0, 0, 0).toString()
+                }
+              },
+              {
+                "timestamp_ms" : {
+                  $lte : Date.UTC(2018, 10, 31, 0, 0, 0).toString()
+                }
+              }
+            ]
+          },
+          {
+            "text": {
+              $regex: "@verapstu",
+              $options: 'i'
+            }
+          }
+        ]
+      }
+    },
+    {
+      $project: {
+        "date": {
+          $dateToString: {
+            "format": "%d-%m-%Y",
+            "date": {
+              $toDate: {
+                $toLong: "$timestamp_ms"
+              }
+            }
+          }
+        },
+        "positivo": {
+          $cond: [ { $eq: ["$classificacao", "Positivo"] }, 1, 0 ]
+        },
+        "negativo": {
+          $cond: [ { $eq: ["$classificacao", "Negativo"] }, 1, 0 ]
+        },
+        "neutro": {
+          $cond: [ { $eq: ["$classificacao", "Neutro"] }, 1, 0 ]
+        }
+      }
+    },
+    {
+      $group: {
+        _id: {
+          "date": "$date"
+        },
+        count: {$sum: 1},
+        positivos: { $sum: "$positivo" },
+        negativos: { $sum: "$negativo" },
+        neutros: { $sum: "$neutro" }
+      }
+    },
+    {
+      $sort: {
+        "_id.date": 1.0
+      }
+    }
+  ]
+)

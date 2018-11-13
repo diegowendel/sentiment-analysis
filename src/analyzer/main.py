@@ -109,9 +109,9 @@ def preprocessar():
 *************************** ANÁLISE DE SENTIMENTOS ***************************
 ******************************************************************************
 '''
-def analisar_sentimentos():
+def treinar_classificador(mostrarAcuracia):
     dataset = mongo.find_all_classificados()
-    tweets = Tweet.get_tweets_texts_from_dataset(dataset)
+    tweets = Tweet.get_tweets_processed_texts_from_dataset(dataset)
     # RESET CURSOR
     dataset = mongo.find_all_classificados()
     classes = Tweet.get_tweets_classifications(dataset)
@@ -124,15 +124,37 @@ def analisar_sentimentos():
 
     ''' TfidfVectorizer + Support Vector Classification (SVC) '''
     vectorizer = TfidfVectorizer(min_df=0.0, max_df=1.0, sublinear_tf=True, use_idf=True)
-    classifier = SVC(kernel='rbf', C=2.9, gamma=1)
+    # classifier = SVC(kernel='rbf', C=2.9, gamma=1) # 84,9%
+    classifier = SVC(kernel='rbf', C=1.9, gamma=1, random_state=None, verbose=False, shrinking=True)  # 85%
 
     classificador = Classifier(vectorizer=vectorizer, classifier=classifier)
     classificador.train(tweets=tweets, classifications=classes)
 
-    resultados = classificador.cross_validation(tweets, classes, 10)
-    Logger.ok('ACURÁCIA: ' + str(classificador.accuracy(classes, resultados)))
+    if mostrarAcuracia:
+        resultados = classificador.cross_validation(tweets, classes, 10)
+        Logger.ok('ACURÁCIA: ' + str(classificador.accuracy(classes, resultados)))
+        classificador.matriz_confusao(classes, resultados)
 
-    classificador.matriz_confusao(classes, resultados)
+    return classificador
+
+def analisar_sentimentos():
+    classificador = treinar_classificador(mostrarAcuracia=False)
+
+    inicio = 1
+    fim = 30000
+    j = 1
+    for i in range(inicio, fim):
+        print(j)
+        j = j + 1
+        tweets = mongo.find_paginated(100, i)
+        tweets_texts = Tweet.get_tweets_texts_from_dataset(tweets)
+        resultados = classificador.predict(tweets_texts)
+
+        # RESET CURSOR
+        tweets = mongo.find_paginated(100, i)
+        for index, tweet in enumerate(tweets):
+            tweet['classificacao'] = resultados[index]
+            mongo.update(tweet)
 
 '''
 ******************************************************************************
@@ -146,7 +168,7 @@ def main():
     # salvar_csv()
     # migrar()
 
-    preprocessar() # Pré-processa os tweets
+    # preprocessar() # Pré-processa os tweets
     analisar_sentimentos() # Analisa os sentimentos dos tweets
 
 if __name__ == "__main__":
