@@ -5,6 +5,7 @@ from sklearn.svm import SVC
 
 from src.analyzer.classifier import Classifier
 from src.analyzer.preprocessor import PreProcessor
+from src.analyzer.sentilex import Sentilex
 from src.database.database_mongo import DatabaseMongo
 from src.utils.logger import Logger
 from src.utils.utils import Tweet
@@ -15,6 +16,7 @@ import pandas as pd
 
 mongo = DatabaseMongo()
 preprocessor = PreProcessor()
+sentilex = Sentilex()
 
 '''
 ******************************************************************************
@@ -141,7 +143,7 @@ def analisar_sentimentos():
     classificador = treinar_classificador(mostrarAcuracia=False)
 
     inicio = 1
-    fim = 30000
+    fim = 5000
     j = 1
     for i in range(inicio, fim):
         print(j)
@@ -170,6 +172,24 @@ def main():
 
     # preprocessar() # Pré-processa os tweets
     analisar_sentimentos() # Analisa os sentimentos dos tweets
+
+    # dicionario = sentilex.get_sentilex_dictionary()
+    # inicio = 1
+    # fim = 101
+    # j = 1
+    # for i in range(inicio, fim):
+    #     tweets = mongo.find_paginated(100, i)
+    #
+    #     for tweet in tweets:
+    #         print(j)
+    #         j = j + 1
+    #         # Verifica se é um tweet com texto estendido
+    #         if 'extended_tweet' in tweet:
+    #             tweet['preprocessado'] = preprocessor.process(tweet['extended_tweet']['full_text'])
+    #         else:
+    #             tweet['preprocessado'] = preprocessor.process(tweet['text'])
+    #         tweet['classificacao'] = sentilex.get_score_phrase(tweet['preprocessado'], dicionario)
+    #         mongo.persist_classified(tweet)
 
 if __name__ == "__main__":
     # Calling main function

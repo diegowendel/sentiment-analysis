@@ -19,6 +19,7 @@ class DatabaseMongo(object):
         database = client['tsap']
         self.collection = database['tweets']
         self.collection_classificados = database['tweets_classificados']
+        self.collection_testes_classificados = database['tweets_testes_classificados']
         self.collection_manual = database['tweets_classificados_N_P_T']
 
     def find_paginated(self, page_size, page_num):
@@ -55,6 +56,9 @@ class DatabaseMongo(object):
 
     def persist_classified(self, tweet):
         self.collection_classificados.save(tweet)
+
+    def persist_test_classified(self, tweet):
+        self.collection_testes_classificados.save(tweet)
 
     def persist_tweet(self, tweet):
         try:
