@@ -19,6 +19,8 @@ class DatabaseMongo(object):
         database = client['tsap']
         self.collection = database['tweets']
         self.collection_classificados = database['tweets_classificados']
+        self.collection_classificados_sentilex = database['tweets_classificados_sentilex']
+        self.collection_classificados_manualmente = database['tweets_classificados_manualmente']
         self.collection_testes_classificados = database['tweets_testes_classificados']
         self.collection_manual = database['tweets_classificados_N_P_T']
 
@@ -51,11 +53,28 @@ class DatabaseMongo(object):
         tweets = self.collection_classificados.find({})
         return tweets
 
+    def find_all_classificados_manualmente(self):
+        tweets = self.collection_classificados_manualmente.find({})
+        return tweets
+
+    def find_all_classificados_sentilex(self):
+        tweets = self.collection_classificados_sentilex.find({})
+        return tweets
+
     def update(self, tweet):
         self.collection.save(tweet)
 
+    def remove(self, tweet):
+        self.collection.remo
+
     def persist_classified(self, tweet):
         self.collection_classificados.save(tweet)
+
+    def persist_classified_manualmente(self, tweet):
+        self.collection_classificados_manualmente.save(tweet)
+
+    def persist_classified_sentilex(self, tweet):
+        self.collection_classificados_sentilex.save(tweet)
 
     def persist_test_classified(self, tweet):
         self.collection_testes_classificados.save(tweet)

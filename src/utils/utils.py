@@ -31,3 +31,14 @@ class Tweet(object):
         for tweet in dataset:
             classifications.append(tweet['classificacao'])
         return classifications
+
+    def get_tweets_classifications_as_number(dataset):
+        classifications = []
+        for tweet in dataset:
+            if tweet['classificacao'] == 'Negativo':
+                classifications.append(-1)
+            elif tweet['classificacao'] == 'Positivo':
+                classifications.append(1)
+            else:
+                classifications.append(0)
+        return classifications

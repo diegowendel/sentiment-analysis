@@ -17,19 +17,23 @@ const chartOptions = {
   credits: {
     enabled: false
   },
-  series: [{
+  series: [
+    {
+      name: 'Neutros',
+      data: [],
+      color: '#c1c1d7'
+    },
+    {
       name: 'Positivos',
       data: [],
-      color: '#b3d2ee'
-  }, {
+      color: '#25488e'
+    },
+    {
       name: 'Negativos',
       data: [],
       color: '#cc0000'
-  }, {
-      name: 'Neutros',
-      data: [],
-      color: '#808080'
-  }]
+    }
+  ]
 };
 
 let chart = new Highcharts.Chart(chartOptions);
@@ -50,9 +54,9 @@ $('select').on('change', function(e) {
     dataType: 'json',
     success: (jsonData) => {
       chart.destroy();
-      chartOptions.series[0].data = jsonData.positivos;
-      chartOptions.series[1].data = jsonData.negativos;
-      chartOptions.series[2].data = jsonData.neutros;
+      chartOptions.series[0].data = jsonData.neutros;
+      chartOptions.series[1].data = jsonData.positivos;
+      chartOptions.series[2].data = jsonData.negativos;
       chart = new Highcharts.Chart(chartOptions);
     },
     error: () => {

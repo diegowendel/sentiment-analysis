@@ -12,7 +12,7 @@ class Sentilex(object):
             dicionario_palavra_polaridade[palavra] = polaridade
         return dicionario_palavra_polaridade
 
-    def get_score_phrase(frase, dicionario_palavra_polaridade):
+    def get_score_phrase(self, frase, dicionario_palavra_polaridade):
         l_sentimento = []
         for p in frase.split():
             l_sentimento.append(int(dicionario_palavra_polaridade.get(p, 0)))
