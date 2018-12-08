@@ -1,6 +1,6 @@
 ## Twitter Sentiment Analysis
 
-### Trabalho de conclusão de curso apresentado ao Instituto de Ciência e Tecnologia – UNIFESP, como parte das atividades para obtenção do título de Bacharel em Engenharia de Computação.
+### Trabalho de conclusão de curso apresentado ao Instituto de Ciência e Tecnologia – UNIFESP
 
 #### Análise de Sentimentos Utilizando o Twitter nas Eleições Brasileiras de 2018.
 
