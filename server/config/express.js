@@ -12,6 +12,12 @@ module.exports = () => {
   app.use(bodyParser.urlencoded({extended: true}));
   // Tell express that public is the root of our public web folder
   app.use(express.static('./public'));
+  // CORS
+  app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 
   app.set('view engine', 'ejs');
   app.set('views', './app/views');

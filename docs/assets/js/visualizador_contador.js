@@ -69,7 +69,7 @@ $('select').on('change', function(e) {
   }
 
   $.ajax({
-    url: `/api/tweets/quantidade/` + this.value,
+    url: `http://54.94.247.69/api/tweets/quantidade/` + this.value,
     type: 'GET',
     dataType: 'json',
     success: (jsonData) => {
