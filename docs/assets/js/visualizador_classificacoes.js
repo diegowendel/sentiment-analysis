@@ -49,7 +49,7 @@ $('select').on('change', function(e) {
   }
 
   $.ajax({
-    url: `http://54.94.247.69/api/classificacoes/quantidade/` + this.value,
+    url: `https://54.94.247.69/api/classificacoes/quantidade/` + this.value,
     type: 'GET',
     dataType: 'json',
     success: (jsonData) => {
