@@ -10,4 +10,3 @@ docker run  $NAME \
             $PORTS \
             $VOLUME \
             -d mongo:4
-

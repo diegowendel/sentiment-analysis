@@ -18,7 +18,7 @@ module.exports = (app) => {
             if (a[0] > b[0]) return 1;
             return 0;
           });
-          
+
           res.status(200).json(dataToChart);
         } else {
           res.status(500).send('');
@@ -26,6 +26,6 @@ module.exports = (app) => {
       });
     }
   };
-  
+
   return TweetController;
 };

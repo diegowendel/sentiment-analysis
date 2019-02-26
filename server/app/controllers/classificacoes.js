@@ -52,6 +52,6 @@ module.exports = (app) => {
       });
     }
   };
-  
+
   return ClassificacoesController;
 };
